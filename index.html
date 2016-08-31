@@ -1,0 +1,397 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<!--<link rel="stylesheet" href="css/theme/black.css">-->
+	<link rel="stylesheet" href="css/theme/white.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<link rel="stylesheet" href="css/mine.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+	var link = document.createElement( 'link' );
+	link.rel = 'stylesheet';
+	link.type = 'text/css';
+	link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+	document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+</head>
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h3>Continuous distribution for Qt applications on desktop and mobile</h3>
+				<p>
+					<small><a href="https://twitter.com/lasconic">Nicolas Froment</a> / <a href="http://twitter.com/lasconic">@lasconic</a></small>
+				</p>
+				<p>
+					<small><a href="https://musescore.com"><img src="images/musescore.png"></a></small>
+				</p>
+			</section>
+			<section>
+				<h2>The Qt Vow</h2>
+				<p>Qt: Code once deploy everywhere</p>
+				<p></p>
+				<p class="fragment">Competitors: Fast distribution!</p>
+				<p class="fragment">Qt: Tests and distribute everywhere?</p>
+				<aside class="notes">
+					<ul>
+			  		<li>How many of you have one or more apps on the App Store or Google Play?</li>
+			  		<li>How many of you have one or more desktop apps?</li>
+			  		<li>How many of you automatically distribute binaries?</li>
+			  	</ul>
+			  </aside>
+			</section>
+			<section>
+				<h1>MuseScore use case</h1>
+			</section>
+			<section>
+				<h1>MuseScore</h1>
+				<p>Create sheet music on desktop</p>
+				<table>
+					<tr>
+						<td><b>Platform</b></td>
+						<td>Windows, MacOSX, Linux</td>
+					</tr>
+					<tr>
+						<td><b>Build system</b></td>
+						<td>Cmake</td>
+					</tr>
+					<tr>
+						<td><b>Code</b></td>
+						<td>Qt Widgets, GPL on github.com</td>
+					</tr>
+					<tr>
+						<td><b>Developers</b></td>
+						<td>100, 5 regular</td>
+					</tr>
+					<tr>
+						<td><b>Testers</b></td>
+						<td>1000s</td>
+					</tr>
+					<tr>
+						<td><b>Popularity</b></td>
+						<td>150000 downloads per month</td>
+					</tr>
+					<tr>
+						<td><b>Home</b></td>
+						<td>https://musescore.org</td>
+					</tr>
+				</table>
+			</section>
+			<section>
+				<h1>MuseScore Apps</h1>
+				<p>Practice sheet music on mobile</p>
+				<table>
+					<tr>
+						<td><b>Platform</b></td>
+						<td>Android, iOS</td>
+					</tr>
+					<tr>
+						<td><b>Build system</b></td>
+						<td>Qmake</td>
+					</tr>
+					<tr>
+						<td><b>Code</b></td>
+						<td>Qt Quick, Closed source on github.com</td>
+					</tr>
+					<tr>
+						<td><b>Developers</b></td>
+						<td>1 to 2</td>
+					</tr>
+					<tr>
+						<td><b>Testers</b></td>
+						<td>100s</td>
+					</tr>
+					<tr>
+						<td><b>Popularity</b></td>
+						<td>Top 5 in Music category in >80 countries</td>
+					</tr>
+					<tr>
+						<td><b>Home</b></td>
+						<td>https://musescore.com</td>
+					</tr>
+				</table>
+			</section>
+			<section>
+				<h1>Challenges</h1>
+				<ul>
+					<li>Run tests for every commit</li>
+					<li>Automate distribution to testers</li>
+					<li>5 targets OSes</li>
+				</ul>
+				<p class="fragment">But...</p>
+				<ul class="fragment" >
+					<li>Not much human resources</li>
+					<li>Sysadmin is no fun</li>
+				</ul>
+			</section>
+			<section>
+				<h3>Continuous integration software</h3>
+				<ul>
+					<li>Hudson</li>
+					<li>Jenkins</li>
+				</ul>
+				<p class="fragment">DIY, your own server, security, upgrades...</p>
+				<p class="fragment">No thanks.</p>
+			</section>
+			<section>
+				<h3>Continuous integration SaaS</h3>
+				<p>For a git commit</p>
+				<ul>
+					<li>Launch servers</li>
+					<li>Get the code</li>
+					<li>Run scripts</li>
+					<li>Store results</li>
+					<li>Notify if failure</li>
+				</ul>
+				<p class="fragment"><img src="images/ci.jpg"></p>
+			</section>
+			<section>
+				<img width="40%" height="40%" src="images/travis.png">
+				<ul>
+					<li>Free fair use for open source project</li>
+					<li>129$/m for private github repo, 2 parallel builds</li>
+					<li>Linux containers: Linux and Android builds</li>
+					<li>MacOS virtual servers: MacOS and iOS builds</li>
+					<li>No windows support :(</li>
+				</ul>
+				<p class="fragment">→ AppVeyor: Windows specialists</p>
+			</section>
+			<section>
+				<img src="images/musescore-ci.jpg">
+			</section>
+			<section>
+				<h1><pre>.travis.yml</pre></h1>
+				<pre><code class="hljs" data-trim contenteditable>
+language: cpp
+before_install:
+- "source build/travis/job1_Tests/environment.sh"
+install:
+- "./build/travis/job1_Tests/install.sh"
+before_script:
+- "./build/travis/job1_Tests/before_script.sh"
+script:
+- "./build/travis/job1_Tests/run_tests.sh"
+after_script:
+- "./build/travis/job1_Tests/upload.sh"
+				</code></pre>
+				<p>Keep it short and use scripts</p>
+			</section>
+			<section>
+				<h2>Dependencies</h2>
+				<ul>
+					<li>Use package manager (<code>apt-get</code>, <code>brew</code>, <code>cocoapods</code>, <code>qpm</code>)</li>
+					<li>If not possible, download from official website and install</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Install Qt without UI?</h2>
+				<ul>
+					<li class="fragment">It's more complicated than it should be...</li>
+					<li class="fragment">... until you realize Qt installer is <a href="http://doc.qt.io/qtinstallerframework/noninteractive.html">scriptable</a></li>
+					<li class="fragment">Amazing <a href="https://github.com/benlau/qtci/blob/master/bin/extract-qt-installer"><code>extract-qt-installer</code></a> by @benlau</li>
+					<li class="fragment">(use a machine with a UI, install, zip, store and download)</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Compilation</h2>
+				<p>Limited time : 50 to 120 minutes</p>
+				<ul>
+					<li>Parallelize build and tests</li>
+					<li>Precompiled header</li>
+					<li><code>ccache</code></li>
+					<li>Travis cache</li>
+				</ul>
+			</section>
+			<section>
+				<h2>A word about AppImage</h2>
+				<p>“Linux apps that run anywhere”</p>
+				<ul>
+					<li>One file = one app, all depencies are bundled
+						<li><code>chmod u+x MuseScore*.AppImage</code></li>
+						<li><code>./MuseScore.AppImage</code></li>
+					</ul>
+					<p>If Linux distribution packaging is a pain for your project, give it a try.</p>
+				</section>
+				<section>
+					<h2>Distribution</h2>
+					<ul>
+						<li><code>artefacts</code> -- upload to S3</li>
+						<li>FTP - SFTP</li>
+						<li>BinTray</li>
+						<li>Google Play Store alpha and beta channels</li>
+						<li>App Store beta</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Security</h2>
+					<p>Obviously, don't put anything sensible in your build scripts...</p>
+					<ul>
+						<li>Qt license</li>
+						<li>Code signing, certificate,...</li>
+						<li>AWS S3, bintray, SFTP credentials, Google Play...</li>
+					</ul>
+					<p>Use <a href="https://docs.travis-ci.com/user/environment-variables/#Encrypting-Variables-Using-a-Public-Key">Travis encrypted variables</a>, <a href="https://docs.travis-ci.com/user/encrypting-files/">Travis encrypted files</a> or eventually project settings</p>
+				</section>
+				<section>
+					<h2>Encrypted variables</h2>
+					<pre><code class="hljs" data-trim contenteditable>
+$ travis encrypt SOMEVAR=secretvalue
+					</code></pre>
+					<p>in .travis.yml</p>
+					<pre><code class="hljs" data-trim contenteditable>
+secure: ".... encrypted data ...."
+echo $SOMEVAR
+					</code></pre>
+				</section>
+				<section>
+					<h2>Encrypted files</h2>
+					<pre><code class="hljs" data-trim contenteditable>
+$ travis encrypt-file super_secret.txt
+					</code></pre>
+					<p>in .travis.yml</p>
+					<pre><code class="hljs" data-trim contenteditable>
+openssl aes-256-cbc -K $encrypted_0a6446eb3ae3_key -iv $encrypted_0a6446eb3ae3_key -in super_secret.txt.enc -out super_secret.txt -d
+					</code></pre>
+					<p class="fragment">Multiple files? zip or tar</p>
+				</section>
+				<section>
+					<h2>iOS</h2>
+					<pre><code class="hljs" data-trim contenteditable>
+git:
+  depth: 50000
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+    - os: osx
+      env:
+        - "JOB=iOS"
+      before_install:
+        - gem install fastlane --no-ri --no-rdoc
+        - openssl aes-256-cbc -K $encrypted_f137f5f_key -iv $encrypted_f137f5f_iv -in build/travis/ios/certs/dist.zip.enc -out build/travis/ios/certs/dist.zip -d
+        - unzip build/travis/ios/certs/dist.zip -d build/travis/ios/certs
+        - openssl aes-256-cbc -K $encrypted_ab375fd_key -iv $encrypted_ab375fd_iv -in build/travis/ios/profile/dist_player_appstore.mobileprovision.enc -out build/travis/ios/profile/dist_player_appstore.mobileprovision -d
+        - ./build/travis/ios/add-key.sh
+      install:
+        - source ./build/travis/ios/travis_ios_dependencies.sh
+      before_script:
+        - python build/updateBuildNumber.py -f version.txt
+        - cat version.txt
+      script:
+        - ./build/travis/ios/travis_ios_build.sh
+          </code></pre>
+				</section>
+				<section>
+					<h3><a href="https://www.objc.io/issues/6-build-tools/travis-ci/">Certificates, provisioning profiles</a></h3>
+					<ul>
+						<li>Create a custom keychain</li>
+						<li>Make it default and unlock it</li>
+					</ul>
+					<pre><code class="hljs" data-trim contenteditable>
+security create-keychain -p travis ios-build.keychain
+security default-keychain -s ios-build.keychain
+security unlock-keychain -p travis ios-build.keychain
+					</code></pre>
+				</section>
+				<section>
+					<ul>
+						<li>
+							Add certificates to keychain and allow codesign to access them
+							<pre><code class="hljs" data-trim contenteditable>
+KEYCHAIN=~/Library/Keychains/ios-build.keychain
+CODESIGN=/usr/bin/codesign
+security import apple.cer -k $KEYCHAIN -T $CODESIGN
+security import dist.cer -k $KEYCHAIN -T $CODESIGN
+security import dist.p12 -k $KEYCHAIN -P $IOS_KEY_PASSWORD -T $CODESIGN
+							</code></pre>
+						</li>
+						<li>
+							Put the provisioning profile in place
+							<pre><code class="hljs" data-trim contenteditable>
+PPROFILE=~/Library/MobileDevice/Provisioning\ Profiles
+mkdir -p $PPROFILE
+cp $PROFILE_NAME_PLAYER.mobileprovision $PPROFILE
+							</code></pre>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h2>iOS: build</h2>
+					<ul>
+						<li>
+							Run qmake to generate XCode project
+							<pre><code class="hljs" data-trim contenteditable>
+mkdir $PLAYER_BUILD_ROOT
+cd $PLAYER_BUILD_ROOT
+qmake -r $PLAYER_PRO_FILE -spec macx-ios-clang CONFIG+=release CONFIG+=iphoneos
+							</code></pre>
+						</li>
+				</section>
+				<section>
+					<p>Fastlane: Automate app release process on iOS and Android</p>
+					<img height="65%" width="65%" src="images/intro-fastlane-tree.png">
+				</section>
+				<section>
+					<h2>iOS: build</h2>
+							Run fastlane to build and deploy to app store
+							<pre><code>
+lane :beta do
+  gym(xcargs: "PROVISIONING_PROFILE=&lt;profile-uuid&gt;")
+  pilot(distribute_external: false)
+end
+							</code></pre>
+							<pre><code class="hljs" data-trim contenteditable>
+mkdir fastlane
+cp ../player-qt/build/travis/ios/Fastfile fastlane/
+FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1 fastlane beta
+							</code></pre>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Conclusion</h2>
+					<ul>
+						<li>CI : an important component of our development process</li>
+						<li class="fragment">Qt doesn't really help us for CI</li>
+						<li class="fragment">More tools and documentation needed
+						<li class="fragment">Let's improve together and share our best practices</li>
+						<li class="fragment">You can find me <a href="http://twitter.com/lasconic">@lasconic</a> on <a href="https://slackin.qtmob.org">#qtmob</a> on Slack</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>We don't learn iOS, Windows API, we shouldn't learn the details of building and deploying a mobile app</li>
+						</ul>
+					</aside>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+				{ src: 'plugin/markdown/marked.js' },
+				{ src: 'plugin/markdown/markdown.js' },
+				{ src: 'plugin/notes/notes.js', async: true },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+			</script>
+		</body>
+		</html>
